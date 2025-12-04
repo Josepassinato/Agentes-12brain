@@ -1,0 +1,7 @@
+{
+  "name": "12 Brain Agentes",
+  "description": "A platform to build and deploy custom AI agents, each with their own unique persona and knowledge base.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
