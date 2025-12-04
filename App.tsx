@@ -16,15 +16,8 @@ const App: React.FC = () => {
   const loadAgents = useCallback(() => {
     const loadedAgents = AgentService.getAgents();
     setAgents(loadedAgents);
-    // Check for a previously active agent to potentially restore session
-    const activeId = AgentService.getActiveAgentId();
-    if (activeId) {
-        const agentToActivate = loadedAgents.find(a => a.id === activeId);
-        if (agentToActivate) {
-            setActiveAgent(agentToActivate);
-            setCurrentView('chat'); // Go directly to chat if an agent was active
-        }
-    }
+    // Ensure no agent is active on initial load to always show dashboard
+    AgentService.setActiveAgentId(null);
   }, []);
 
   useEffect(() => {
@@ -78,6 +71,8 @@ const App: React.FC = () => {
           <CreateAgentView
             onAgentCreated={handleAgentCreated}
             onBack={handleReturnToDashboard}
+            agents={agents}
+            apiKey={apiKey}
           />
         );
       case 'chat':

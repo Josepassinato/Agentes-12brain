@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
 import { AgentProfile, AgentVoice, AVAILABLE_VOICES, DEFAULT_SYSTEM_INSTRUCTION } from '../types';
 import { AgentService } from '../services/agentService';
+import PromptHelperModal from './PromptHelperModal';
 
 interface CreateAgentViewProps {
   onAgentCreated: (newAgent: AgentProfile) => void;
   onBack: () => void;
+  agents: AgentProfile[];
+  apiKey: string;
 }
 
-const CreateAgentView: React.FC<CreateAgentViewProps> = ({ onAgentCreated, onBack }) => {
+const CreateAgentView: React.FC<CreateAgentViewProps> = ({ onAgentCreated, onBack, agents, apiKey }) => {
   const [name, setName] = useState('');
   const [icon, setIcon] = useState('🤖');
   const [instructions, setInstructions] = useState(DEFAULT_SYSTEM_INSTRUCTION);
   const [voice, setVoice] = useState<AgentVoice>('Zephyr');
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+
+  const alfredProfile = agents.find(a => a.name === "Alfred - Prompt Builder");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,9 +81,20 @@ const CreateAgentView: React.FC<CreateAgentViewProps> = ({ onAgentCreated, onBac
                      </div>
                     
                     <div>
-                        <label htmlFor="instructions" className="block text-sm font-medium text-slate-300 mb-1">
-                            Persona & Instructions
-                        </label>
+                        <div className="flex justify-between items-center mb-1">
+                            <label htmlFor="instructions" className="block text-sm font-medium text-slate-300">
+                                Persona & Instructions
+                            </label>
+                             {alfredProfile && (
+                              <button
+                                type="button"
+                                onClick={() => setIsHelpModalOpen(true)}
+                                className="text-xs text-purple-400 hover:underline font-semibold"
+                              >
+                                ✨ Ask Alfred for help
+                              </button>
+                            )}
+                        </div>
                         <textarea
                             id="instructions"
                             value={instructions}
@@ -96,6 +113,19 @@ const CreateAgentView: React.FC<CreateAgentViewProps> = ({ onAgentCreated, onBac
                 </form>
             </div>
        </div>
+
+        {isHelpModalOpen && alfredProfile && (
+            <PromptHelperModal
+            apiKey={apiKey}
+            alfredProfile={alfredProfile}
+            onClose={() => setIsHelpModalOpen(false)}
+            onPromptGenerated={(prompt) => {
+                setInstructions(prompt);
+                setIsHelpModalOpen(false);
+            }}
+            />
+        )}
+
     </div>
   );
 };
